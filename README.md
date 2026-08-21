@@ -14,19 +14,19 @@ See the paper for methodological details, assumptions, and theoretical results.
 
 1. Clone the repository:
     ```bash
-    $ git clone https://github.com/sidv23/classical-scaling-minimax.git
-    $ cd classical-scaling-minimax
+    git clone https://github.com/sidv23/classical-scaling-minimax.git
+    cd classical-scaling-minimax
     ```
 
 2. Activate the Julia environment:
-    ```julia
-    > julia --project=. -e 'import Pkg; Pkg.instantiate()'
+    ```bash
+    julia --project=. -e 'import Pkg; Pkg.instantiate()'
     ```
 
 
 3. **Run the simulations**:
 
-   ```julia
+   ```bash
    julia simulations.jl
    ```
 
@@ -36,7 +36,7 @@ See the paper for methodological details, assumptions, and theoretical results.
 
 4. **Generate the figures**:
 
-   ```julia
+   ```bash
    julia make-plots.jl
    ```
 
