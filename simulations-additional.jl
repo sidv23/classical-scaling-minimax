@@ -18,7 +18,7 @@ end
 
 ############
 # Three extra noise models, beyond additive / additiveAbs / multiplicative in src/utils.jl:
-#   rounding   d = u*(floor(δ/u) + B),   B | Δ ~ Bernoulli(frac(δ/u))
+#   rounding   d = floor(δ) + B,   B | Δ ~ Bernoulli(frac(δ))
 #   missing    d = (M/π(δ)) * δ,         π(δ) = π0 + (1-π0)exp(-δ),  M | Δ ~ Bernoulli(π(δ))
 #   sparse     d = δ + c*δ*S,            S = 1{δ far in row i and row j}, deterministic
 # rounding/missing use a Uniform[-1/2, 1/2] driver Ξ instead of the t_q driver above;
