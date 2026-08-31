@@ -90,7 +90,7 @@ begin
                 grid=false
             )
             for (m, s) in enumerate(Sigmas)
-                p = plot(p, Ns, n -> 3.0 * sqrt(q/(q-2)) * s * kappa .* √(1 / n), ls=:dash, label="", c=cls3[m])
+                p = plot(p, Ns, n -> 0.15 * sqrt(q/(q-2)) * s .* √(kappa / n), ls=:dash, label="", c=cls3[m])
             end
             p
         end
@@ -99,7 +99,7 @@ begin
     dm = dm_1()
     dm = title!(dm, "\n" * L"L${}_{\textrm{rmse}}$")
     dm = plot!(dm, zeros(1), c=:black, ls=:dash, label=L"${\sigma\kappa} \cdot \sqrt{1/n}$")
-    p11 = plot(dm, plts..., layout=l_1(), size=(900, 1000), scale=:log10, ylim=(2e-3, 5e-1))
+    p11 = plot(dm, plts..., layout=l_1(), size=(900, 1000), scale=:log10, ylim=(2e-4, 5e-2))
 end
 savefig(p11, "plots/p11.pdf")
 
@@ -137,7 +137,7 @@ begin
                 grid=false
             )
             for (m, s) in enumerate(Sigmas)
-                p = plot(p, Ns, n -> 2.0 * s * sqrt(q/(q-2)) * kappa .* √(log(n) / n), ls=:dash, label="", c=cls3[m])
+                p = plot(p, Ns, n -> 0.15 * s * sqrt(q/(q-2)) .* √(kappa .* log(n) / n), ls=:dash, label="", c=cls3[m])
             end
             p
         end
@@ -146,7 +146,7 @@ begin
     dm = dm_1()
     dm = title!(dm, "\n" * L"L${}_{2\!\!\to\!\!\infty}$")
     dm = plot!(dm, zeros(1), c=:black, ls=:dash, label=L"${\sigma\kappa^2} \cdot \sqrt{\log{n}/n}$")
-    p12 = plot(dm, plts..., layout=l_1(), size=(900, 1000), scale=:log10, ylim=(5e-3, 1e1))
+    p12 = plot(dm, plts..., layout=l_1(), size=(900, 1000), scale=:log10, ylim=(5e-4, 1e-1))
 end
 savefig(p12, "plots/p12.pdf")
 
@@ -199,7 +199,7 @@ begin
             right_margin=i == length(Sigmas) ? 2 * Plots.mm : 1 * Plots.mm,
             grid=false
         )
-        p = plot(p, Ns, n -> 2.3 * s .* √(1/n), ls=:dash, label="", c=:black)
+        p = plot(p, Ns, n -> 0.2 * s .* √(Ks[2] /n), ls=:dash, label="", c=:black)
         p
     end
         for (i, s) in enumerate(Sigmas), (j, noise) in enumerate(Noises)
@@ -207,7 +207,7 @@ begin
     dm = dm_2()
     dm = title!(dm, "\n" * L"L${}_{\mathrm{rmse}}$")
     dm = plot!(dm, zeros(1), c=:black, ls=:dash, label=L"${\sigma} \cdot \sqrt{1/n}$")
-    p21 = plot(dm, plts..., layout=l_2(), size=(300, 200) .* (length(Noises), length(Sigmas)), scale=:log10, ylim=(2e-3, 1e-0))
+    p21 = plot(dm, plts..., layout=l_2(), size=(300, 200) .* (length(Noises), length(Sigmas)), scale=:log10, ylim=(2e-4, 1e-0))
 end
 savefig(p21, "plots/p21.pdf")
 
@@ -246,7 +246,7 @@ begin
                 right_margin=i == length(Sigmas) ? 2 * Plots.mm : 1 * Plots.mm,
                 grid=false
             )
-            p = plot(p, Ns, n -> 2 * s .* √(log(n) / n), ls=:dash, label="", c=:black)
+            p = plot(p, Ns, n -> 0.15 * s .* √(Ks[2] * log(n) / n), ls=:dash, label="", c=:black)
             p
         end
         for (i, s) in enumerate(Sigmas), (j, noise) in enumerate(Noises)
@@ -254,6 +254,6 @@ begin
     dm = dm_2()
     dm = title!(dm, "\n" * L"L${}_{2\!\!\to\!\!\infty}$")
     dm = plot!(dm, zeros(1), c=:black, ls=:dash, label=L"${\sigma} \cdot \sqrt{\log{n}/n}$")
-    p22 = plot(dm, plts..., layout=l_2(), size=(300, 230) .* (length(Noises), length(Sigmas)), scale=:log10, ylim=(5e-3, 2e1))
+    p22 = plot(dm, plts..., layout=l_2(), size=(300, 230) .* (length(Noises), length(Sigmas)), scale=:log10, ylim=(5e-4, 3e1))
 end
 savefig(p22, "plots/p22.pdf")

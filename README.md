@@ -43,6 +43,11 @@ See the paper for methodological details, assumptions, and theoretical results.
    This reads `results/simulations.jld2` and generates the plots `plots/pxx.pdf` corresponding to the $L_{\text{rmse}}$ and $L_{2\to\infty}$ error plots.
 
 
+#### Additional noise models
+
+`simulations-additional.jl` runs simulations for three additional noise models (_random rounding_, _missing-at-random_, and _sparse biased noise_) beyond the ones covered in `simulations.jl`, and generates the corresponding figure `plots/p-additional.pdf`.
+
+
 
 ## Citation
 

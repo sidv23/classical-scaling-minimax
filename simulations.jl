@@ -14,7 +14,6 @@ for filename in readdir("src")
     end
 end
 
-
 function simulation(n; d=3, q=5, sigma=0.1, kappa=1.0, R=1.0, seed=0, noise=:additive)
     if seed != 0
         Random.seed!(2025 + seed)
@@ -36,7 +35,6 @@ function simulation(n; d=3, q=5, sigma=0.1, kappa=1.0, R=1.0, seed=0, noise=:add
     Error = norm.(eachrow(Xnhat - Xn))
     maximum(Error), sqrt(mean(Error .^ 2))
 end
-
 
 
 Ns = [250; 500; 1000; 2500; 5000]

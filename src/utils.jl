@@ -58,7 +58,8 @@ function Dist(Δ, Ξ; sigma=0.1, noise=:additive)
         D = Δ .+ (Ξ .* sigma)
         # p = 1
     elseif noise == :additiveAbs
-        D = abs.(Δ .+ (Ξ .* sigma))
+        σΞ = sigma .* Ξ
+        D = Δ .+ (σΞ .^ 2) .+ (2 .* σΞ .* sqrt.(Δ))
         # p = 1
     elseif noise == :multiplicative
         D = Δ .* (1 .+ (Ξ .* sigma))
