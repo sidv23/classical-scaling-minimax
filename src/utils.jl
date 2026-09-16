@@ -46,30 +46,18 @@ end
 
 function mds(D::Matrix, d::Int)
     E = doubleCentering(D)
-    # λ, V = eigen(E)
-    # L = V[:, end:-1:end-d+1] .* .√λ[end:-1:end-d+1]'
     λ, V = eigs(E, nev=d, which=:LR)
     L = V .* .√λ'
     return L
 end
 
-function Dist(Δ, Ξ; sigma=0.1, noise=:additive)
+function Dist(Δ, Ξ; sigma=1.0, noise=:additive)
     if noise == :additive
-        D = Δ .+ (Ξ .* sigma)
-        # p = 1
+        D = Δ .+ (sigma .* Ξ)
     elseif noise == :additiveAbs
-        σΞ = sigma .* Ξ
-        D = Δ .+ (σΞ .^ 2) .+ (2 .* σΞ .* sqrt.(Δ))
-        # p = 1
+        D = Δ .+ sigma .* ((Ξ .^ 2) .+ (2 .* Ξ .* sqrt.(Δ)))
     elseif noise == :multiplicative
-        D = Δ .* (1 .+ (Ξ .* sigma))
-        # p = 1
+        D = Δ .* (1 .+ (sigma .* Ξ))
     end
     return D
-end
-
-function stress(X, D)
-    # Dx = pairwise(SqEuclidean(), X, dims=1)
-    Dx = pairwise(Euclidean(), X, dims=1)
-    return (Dx .- D) |> triu .|> (x -> x^2) |> mean
 end

@@ -15,12 +15,11 @@ for filename in readdir("src")
     end
 end
 
-
 ############
-# Three extra noise models, beyond additive / additiveAbs / multiplicative in src/utils.jl:
-#   rounding   d = u*(floor(δ/u) + B),   B | Δ ~ Bernoulli(frac(δ/u))
-#   missing    d = (M/π(δ)) * δ,         π(δ) = π0 + (1-π0)exp(-δ),  M | Δ ~ Bernoulli(π(δ))
-#   sparse     d = δ + c*δ*S,            S = 1{δ far in row i and row j}, deterministic
+# Three extra noise models:
+#   1. rounding   d = u*(floor(δ/u) + B),   B | Δ ~ Bernoulli(frac(δ/u))
+#   2. missing    d = (M/π(δ)) * δ,         π(δ) = π0 + (1-π0)exp(-δ),  M | Δ ~ Bernoulli(π(δ))
+#   3. sparse     d = δ + c*δ*S,            S = 1{δ far in row i and row j}, deterministic
 # rounding/missing use a Uniform[-1/2, 1/2] driver Ξ instead of the t_q driver above;
 # sparse ignores Ξ entirely.
 
@@ -40,10 +39,10 @@ function far_mask(Δ, α)
     return S
 end
 
-function noise_driver(n, noise; q=5, sigma=0.1)
+function noise_driver(rng, n, noise; q=5, sigma=0.1)
     Ξ = noise in (:rounding, :missing, :sparse) ?
-        Matrix(Symmetric(rand(Uniform(-0.5, 0.5), n, n))) :
-        Matrix(Symmetric(rand(TDist(q), n, n))) .* sigma
+        Matrix(Symmetric(rand(rng, Uniform(-0.5, 0.5), n, n))) :
+        Matrix(Symmetric(rand(rng, TDist(q), n, n))) .* sigma
     Ξ[diagind(Ξ)] .= 0.0
     return Ξ
 end
@@ -98,11 +97,8 @@ function sigma_eff(Δ, Ξ; sigma=0.1, noise=:additive, u=0.25, pi0=0.6, a=1.0, d
 end
 
 
-function simulation(n; d=3, q=5, sigma=0.1, kappa=1.0, R=1.0, seed=0, noise=:additive, level=NamedTuple())
-    if seed != 0
-        Random.seed!(2025 + seed)
-    end
-    Xn = randBall(n, d=d)
+function simulation(rng, n; d=3, q=5, sigma=0.1, kappa=1.0, R=1.0, seed=0, noise=:additive, level=NamedTuple())
+    Xn = randBall(rng, n, d=d)
     Xn .= Xn |>
             x -> map(
                 x -> norm(x) < R ? x : x .* (R / norm(x)),
@@ -112,7 +108,7 @@ function simulation(n; d=3, q=5, sigma=0.1, kappa=1.0, R=1.0, seed=0, noise=:add
     Σ = diagm(0 => range(1 / kappa, kappa, length=d))
     Xn .= Xn * Σ
     Δ = pairwise(SqEuclidean(), Xn, dims=1)
-    Ξ = noise_driver(n, noise; q=q, sigma=sigma)
+    Ξ = noise_driver(rng, n, noise; q=q, sigma=sigma)
     D = Dist(Δ, Ξ; sigma=sigma, noise=noise, level...)
     σ = sigma_eff(Δ, Ξ; sigma=sigma, noise=noise, level...)
     Xnhat = mds(D, d) |> (x -> procrustes(x, Xn))
@@ -138,6 +134,9 @@ NoiseTitles = Dict(
     :sparse => "Sparse noise",
 )
 
+
+rng = Xoshiro(2026)
+
 Ns = [250; 500; 1000; 2500; 5000]
 Ks = [1.0]
 Noises = [:rounding, :missing, :sparse]
@@ -145,18 +144,16 @@ reps = 20
 
 sim_res = Dict(
     noise => @showprogress [
-        simulation(n; d=3, kappa=k, seed=r, noise=noise, level=lvl)
+        simulation(rng, n; d=3, kappa=k, seed=r, noise=noise, level=lvl)
         for (n, k, lvl, r) in Iterators.product(Ns, Ks, NoiseLevels[noise], 1:reps)
     ]
     for noise in Noises
 )
 
-# jldsave(
-#     "results/additional-simulations-3.jld2";
-#     sim_res=sim_res, Ns=Ns, Ks=Ks, Noises=Noises, Levels=NoiseLevels
-# )
-
-
+jldsave(
+    "results/simulations-additional.jld2";
+    sim_res=sim_res, Ns=Ns, Ks=Ks, Noises=Noises, Levels=NoiseLevels
+)
 
 
 ############
@@ -207,4 +204,4 @@ begin
         left_margin=5 * Plots.mm, bottom_margin=4 * Plots.mm, top_margin=2 * Plots.mm,
     )
 end
-savefig(p3, "plots/p3-additional-noise.pdf")
+savefig(p3, "plots/p3-additional.pdf")
